@@ -51,6 +51,7 @@ export default class Play extends Phaser.Scene {
     this.starfield!.tilePositionX -= 4;
 
     if (this.left!.isDown) {
+      //limit left border
       const leftBorder = this.spinner!.x - this.spinner!.width / 2;
 
       this.spinner!.x =
@@ -59,6 +60,7 @@ export default class Play extends Phaser.Scene {
           : this.spinner!.width / 2;
     }
     if (this.right!.isDown) {
+      //limit right border
       const rightBorder = this.spinner!.x + this.spinner!.width / 2;
       this.spinner!.x =
         rightBorder < (this.game.config.width! as number)
@@ -75,16 +77,13 @@ export default class Play extends Phaser.Scene {
         10,
         0x00ff00,
       );
+      //move bullet
       this.tweens.add({
         targets: bullet,
         y: this.spinner?.y! - (this.game.config.height! as number),
         duration: 1000,
         ease: "linear",
-      });
-      //destroy bullet
-      this.time.addEvent({
-        delay: 1000,
-        callback: () => {
+        onComplete: () => {
           bullet.destroy();
         },
       });
