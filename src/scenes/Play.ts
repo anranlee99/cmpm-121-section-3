@@ -9,6 +9,7 @@ export default class Play extends Phaser.Scene {
 
   starfield?: Phaser.GameObjects.TileSprite;
   spinner?: Phaser.GameObjects.Shape;
+  moveSpeed?: number;
 
   rotationSpeed = Phaser.Math.PI2 / 1000; // radians per millisecond
 
@@ -27,6 +28,7 @@ export default class Play extends Phaser.Scene {
   }
 
   create() {
+    this.moveSpeed = 0.5;
     this.fire = this.#addKey("F");
     this.left = this.#addKey("LEFT");
     this.right = this.#addKey("RIGHT");
@@ -41,25 +43,40 @@ export default class Play extends Phaser.Scene {
       )
       .setOrigin(0, 0);
 
-    this.spinner = this.add.rectangle(100, 100, 50, 50, 0xff0000);
+    this.spinner = this.add.rectangle(300, 400, 50, 50, 0xff0000);
   }
 
   update(_timeMs: number, delta: number) {
     this.starfield!.tilePositionX -= 4;
 
     if (this.left!.isDown) {
-      this.spinner!.rotation -= delta * this.rotationSpeed;
+      this.spinner!.x -= delta * this.moveSpeed!;
     }
     if (this.right!.isDown) {
-      this.spinner!.rotation += delta * this.rotationSpeed;
+      this.spinner!.x += delta * this.moveSpeed!;
     }
 
     if (this.fire!.isDown) {
+      //spawn bullet
+      const bullet = this.add.rectangle(
+        this.spinner?.x,
+        this.spinner?.y,
+        10,
+        10,
+        0x00ff00,
+      );
       this.tweens.add({
-        targets: this.spinner,
-        scale: { from: 1.5, to: 1 },
-        duration: 300,
-        ease: Phaser.Math.Easing.Sine.Out,
+        targets: bullet,
+        y: this.spinner?.y! - (this.game.config.height! as number),
+        duration: 1000,
+        ease: "linear",
+      });
+      //destroy bullet
+      this.time.addEvent({
+        delay: 1000,
+        callback: () => {
+          bullet.destroy();
+        },
       });
     }
   }
