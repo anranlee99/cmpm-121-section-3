@@ -44,16 +44,26 @@ export default class Play extends Phaser.Scene {
       .setOrigin(0, 0);
 
     this.spinner = this.add.rectangle(300, 400, 50, 50, 0xff0000);
+    this.spinner.setOrigin(0.5, 0.5);
   }
 
   update(_timeMs: number, delta: number) {
     this.starfield!.tilePositionX -= 4;
 
     if (this.left!.isDown) {
-      this.spinner!.x -= delta * this.moveSpeed!;
+      const leftBorder = this.spinner!.x - this.spinner!.width / 2;
+
+      this.spinner!.x =
+        leftBorder > 0
+          ? this.spinner!.x - delta * this.moveSpeed!
+          : this.spinner!.width / 2;
     }
     if (this.right!.isDown) {
-      this.spinner!.x += delta * this.moveSpeed!;
+      const rightBorder = this.spinner!.x + this.spinner!.width / 2;
+      this.spinner!.x =
+        rightBorder < (this.game.config.width! as number)
+          ? this.spinner!.x + delta * this.moveSpeed!
+          : (this.game.config.width! as number) - this.spinner!.width / 2;
     }
 
     if (this.fire!.isDown) {
